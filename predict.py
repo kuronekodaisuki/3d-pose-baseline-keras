@@ -2,15 +2,18 @@
 # OpenPose Position to 3D Position
 # ----------------------------------------------
 
-import cv2
+import cv2 as cv
 import sys
 import numpy as np
 import pandas as pd
 import os
-import caffe
+#import caffe
 import h5py
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+
+import plaidml.keras
+plaidml.keras.install_backend()
 
 from mpl_toolkits.mplot3d import Axes3D
 from keras.models import load_model
@@ -38,13 +41,13 @@ if len(sys.argv) >= 5:
   IMAGE_HEIGHT = int(sys.argv[4])
 
 if not os.path.exists(IMAGE_PATH):
-	print(IMAGE_PATH+" not found")
+	print(IMAGE_PATH + " not found")
 	sys.exit(1)
 
-print IMAGE_PATH
-input_img = cv2.imread(IMAGE_PATH)
+print(IMAGE_PATH)
+input_img = cv.imread(IMAGE_PATH)
 
-img = cv2.resize(input_img, (IMAGE_WIDTH, IMAGE_HEIGHT))
+img = cv.resize(input_img, (IMAGE_WIDTH, IMAGE_HEIGHT))
 
 img = img[...,::-1]  #BGR 2 RGB
 
@@ -53,12 +56,18 @@ data.shape = (1,) + data.shape
 
 data = data / 255.0
 
-net  = caffe.Net(PROTOTXT, CAFFE_MODEL, caffe.TEST)
+net  = cv.dnn.readNetFromCaffe(PROTOTXT, CAFFE_MODEL) #caffe.Net(PROTOTXT, CAFFE_MODEL, caffe.TEST)
 data = data.transpose((0, 3, 1, 2))
-out = net.forward_all(data = data)
+net.setInput(data)
+out = net.forward()
+print(type(out), out.shape)
+print(net.getLayerNames())
 
-paf = out[net.outputs[0]]
-confidence = out[net.outputs[1]]
+
+sys.exit(1)
+
+#paf = out[net.outputs[0]]
+#confidence = out[net.outputs[1]]
 
 # ----------------------------------------------
 # Display output
@@ -67,19 +76,19 @@ confidence = out[net.outputs[1]]
 points = []
 threshold = 0.1
 
-for i in range(confidence.shape[1]):
-	probMap = confidence[0, i, :, :]
-	minVal, prob, minLoc, point = cv2.minMaxLoc(probMap)
-
-	x = (input_img.shape[1] * point[0]) / confidence.shape[3]
-	y = (input_img.shape[0] * point[1]) / confidence.shape[2] 
- 
-	if prob > threshold : 
-		points.append(x)
-		points.append(y)
-	else :
-		points.append(0)
-		points.append(0)
+#for i in range(confidence.shape[1]):
+#	probMap = confidence[0, i, :, :]
+#	minVal, prob, minLoc, point = cv.minMaxLoc(probMap)
+#
+#	x = (input_img.shape[1] * point[0]) / confidence.shape[3]
+#	y = (input_img.shape[0] * point[1]) / confidence.shape[2] 
+#
+#	if prob > threshold : 
+#		points.append(x)
+#		points.append(y)
+#	else :
+#		points.append(0)
+#		points.append(0)
 
 # ----------------------------------------------
 # Convert format
