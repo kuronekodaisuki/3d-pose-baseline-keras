@@ -60,15 +60,8 @@ net  = cv.dnn.readNetFromCaffe(PROTOTXT, CAFFE_MODEL) #caffe.Net(PROTOTXT, CAFFE
 data = data.transpose((0, 3, 1, 2))
 net.setInput(data)
 out = net.forward()
-print(type(out), out.shape)
-print(net.getLayerNames())
 
-
-sys.exit(1)
-
-#paf = out[net.outputs[0]]
-#confidence = out[net.outputs[1]]
-
+confidence = out
 # ----------------------------------------------
 # Display output
 # ----------------------------------------------
@@ -76,19 +69,19 @@ sys.exit(1)
 points = []
 threshold = 0.1
 
-#for i in range(confidence.shape[1]):
-#	probMap = confidence[0, i, :, :]
-#	minVal, prob, minLoc, point = cv.minMaxLoc(probMap)
-#
-#	x = (input_img.shape[1] * point[0]) / confidence.shape[3]
-#	y = (input_img.shape[0] * point[1]) / confidence.shape[2] 
-#
-#	if prob > threshold : 
-#		points.append(x)
-#		points.append(y)
-#	else :
-#		points.append(0)
-#		points.append(0)
+for i in range(confidence.shape[1]):
+	probMap = confidence[0, i, :, :]
+	minVal, prob, minLoc, point = cv.minMaxLoc(probMap)
+
+	x = (input_img.shape[1] * point[0]) / confidence.shape[3]
+	y = (input_img.shape[0] * point[1]) / confidence.shape[2] 
+
+	if prob > threshold : 
+		points.append(x)
+		points.append(y)
+	else :
+		points.append(0)
+		points.append(0)
 
 # ----------------------------------------------
 # Convert format
