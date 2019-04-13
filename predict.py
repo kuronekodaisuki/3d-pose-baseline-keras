@@ -7,7 +7,7 @@ import sys
 import numpy as np
 import pandas as pd
 import os
-#import caffe
+import argparse
 import h5py
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -23,7 +23,7 @@ from keras.models import load_model
 # ----------------------------------------------
 
 MODEL_HDF5 = "3d-pose-baseline.hdf5"
-IMAGE_PATH = "images/running.jpg"
+#IMAGE_PATH = "images/running.jpg"
 CAFFE_MODEL = 'pose_iter_440000.caffemodel'
 PROTOTXT = 'pose_deploy.prototxt'
 
@@ -40,14 +40,19 @@ if len(sys.argv) >= 5:
   IMAGE_WIDTH = int(sys.argv[3])
   IMAGE_HEIGHT = int(sys.argv[4])
 
-if not os.path.exists(IMAGE_PATH):
-	print(IMAGE_PATH + " not found")
+parser = argparse.ArgumentParser()
+parser.add_argument('--input', type=str, default='images/running.jpg')
+parser.add_argument('--width', type=int, default=368)
+parser.add_argument('--height', type=int, default=368)
+args = parser.parse_args()
+
+if not os.path.exists(args.input):
+	print(args.input + " not found")
 	sys.exit(1)
 
-print(IMAGE_PATH)
-input_img = cv.imread(IMAGE_PATH)
+input_img = cv.imread(args.input)
 
-img = cv.resize(input_img, (IMAGE_WIDTH, IMAGE_HEIGHT))
+img = cv.resize(input_img, (args.width, args.height))
 
 img = img[...,::-1]  #BGR 2 RGB
 
