@@ -24,8 +24,8 @@ from keras.models import load_model
 
 MODEL_HDF5 = "3d-pose-baseline.hdf5"
 #IMAGE_PATH = "images/running.jpg"
-CAFFE_MODEL = 'pose_iter_440000.caffemodel'
-PROTOTXT = 'pose_deploy.prototxt'
+#CAFFE_MODEL = 'pose_iter_440000.caffemodel'
+#PROTOTXT = 'pose_deploy.prototxt'
 
 # ----------------------------------------------
 # Input Data
@@ -44,6 +44,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--input', type=str, default='images/running.jpg')
 parser.add_argument('--width', type=int, default=368)
 parser.add_argument('--height', type=int, default=368)
+parser.add_argument('--proto', type=str, default='pose_deploy.prototxt')
+parser.add_argument('--model', type=str, default='pose_iter_440000.caffemodel')
 args = parser.parse_args()
 
 if not os.path.exists(args.input):
@@ -61,7 +63,7 @@ data.shape = (1,) + data.shape
 
 data = data / 255.0
 
-net  = cv.dnn.readNetFromCaffe(PROTOTXT, CAFFE_MODEL) #caffe.Net(PROTOTXT, CAFFE_MODEL, caffe.TEST)
+net  = cv.dnn.readNetFromCaffe(args.proto, args.model) #caffe.Net(PROTOTXT, CAFFE_MODEL, caffe.TEST)
 data = data.transpose((0, 3, 1, 2))
 net.setInput(data)
 out = net.forward()

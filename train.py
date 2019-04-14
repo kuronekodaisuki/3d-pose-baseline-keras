@@ -6,7 +6,10 @@ import os.path,sys
 import numpy as np
 import h5py
 
-os.environ['KERAS_BACKEND'] = 'tensorflow'
+import plaidml.keras
+plaidml.keras.install_backend()
+
+#os.environ['KERAS_BACKEND'] = 'tensorflow'
 
 from keras.layers.convolutional import Convolution2D, Conv2D
 from keras.layers.convolutional import MaxPooling2D
